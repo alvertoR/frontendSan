@@ -14,40 +14,13 @@
             <label for="busqueda">
                 <div class="input-busqueda">
                     <img src="../assets/landing/lupa.svg">
-                    <input id="busqueda" type="search" placeholder="Nombre del producto">
+                    <input v-model="searchProduct" type="search" placeholder="Nombre del producto">
                 </div>
             </label>
             <!--Galeria-->
             <ul class="galeria">
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
-                </li>
-                <li>
-                    <img src="../assets/rey.jpg" />
+                <li v-for="product in searchProducts" @click="showProduct(product)">
+                    <img :src="product.ulrImg" alt="Imagen de un producto"/>
                 </li>
             </ul>
             <!--Fin Galeria-->
@@ -60,11 +33,69 @@
 
 <script>
 
-import Button from '../components/Button.vue';
+import Button    from '../components/Button.vue';
+import routesApi from '../backRoutes';
 
 export default {
+    data(){
+        return{
+            products:[],
+            searchProduct: '',
+        }
+    },
     components:{
         Button
+    },
+    methods:{
+        getProducts(){
+            const listProducts = [];
+
+            this.axios.get(routesApi.getProducts)
+            .then((res) => {
+                let products = res.data.data;
+
+                products.map((value) => {
+                    listProducts.push({
+                        id:       value._id,
+                        name:     value.name,
+                        price:    value.value,
+                        ulrImg:   value.picture,
+                        category: value.category
+                    });
+                });
+
+            });
+
+             this.products = listProducts;
+
+        },
+        showProduct(values){
+
+            let slug = values.name.replace(" ",'-');
+            
+            this.$router.push({
+                name:"producto",
+                params: {
+                    slug,
+                    img:      values.ulrImg,
+                    name:     values.name,
+                    price:    values.price,
+                    category: values.category,
+                    id:    values.id
+                }
+            });
+        }
+
+    },
+    computed:{
+        searchProducts: function(){
+            return this.products.filter((product) => {
+                return product.name.includes(this.searchProduct);
+            });
+        },        
+    },
+    mounted(){
+        this.getProducts();
     }
 }
 </script>

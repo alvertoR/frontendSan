@@ -1,19 +1,19 @@
 <template>
     <div>
-        <Button type="circle">
+        <Button @click="back()" type="circle">
             <img src="../assets/landing/back.svg" />
         </Button>
         <div class="container">
             <div class="picture">
-                <img src="../assets/rey.jpg" alt="">
+                <img :src="product.imgUrl" alt="">
             </div>
             <div class="edit">
                 <div class="left">
-                    <h2>Ponqué de vino Bimbo</h2>
-                    <p>$1500</p>
+                    <h2>{{ product.name }}</h2>
+                    <p>{{ '$'+product.price }}</p>
                 </div>
                 <div class="right" v-if="login == true">
-                    <Button type="circle">
+                    <Button @click="editProductView()" type="circle">
                         <img src="../assets/landing/edit.svg" />
                     </Button>
                 </div>
@@ -34,8 +34,47 @@ export default {
     },
     data(){
         return{
-            login: false,
+            login: true,
+            product:{
+                name:      '',
+                price:     '',
+                imgUrl:    '',
+                category:  '',
+                idProduct: ''
+            }
         }
+    },
+    methods:{
+        setProduct(){
+            this.product.idProduct = this.$route.params.id;
+            this.product.imgUrl    = this.$route.params.img;
+            this.product.name      = this.$route.params.name;
+            this.product.price     = this.$route.params.price;
+            this.product.category  = this.$route.params.category;
+        },
+        back(){
+            if(this.login == true){
+                this.$router.push({ path:'/user'});
+            }else{
+                this.$router.push({ path:'/'});
+            }
+        },
+        editProductView(){            
+            this.$router.push({
+                name:"editar",
+                params: {
+                    slug:     this.$route.params.slug,
+                    img:      this.product.imgUrl,
+                    name:     this.product.name,
+                    price:    this.product.price ,
+                    category: this.product.category,
+                    id:       this.product.idProduct
+                }
+            });
+        }
+    },
+    mounted(){
+        this.setProduct();
     }
 }
 </script>
@@ -117,6 +156,15 @@ Button img{
     width: 80%;
     height: 100%;
 }
+
+.edit .left h2{
+    font-size: 8.5vw;
+}
+
+.edit .left p{
+    font-size: 10vw;
+}
+
 .edit .right{
     width: 28%;
     height: 100%;

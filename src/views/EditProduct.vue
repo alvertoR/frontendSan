@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Button type="circle">
+        <Button @click="back()" type="circle">
             <img src="../assets/landing/back.svg" />
         </Button>
         <h2>Datos del producto</h2>
@@ -8,21 +8,21 @@
             <label for="nombre">
                 <p>Nombre</p>
                 <div class="input">
-                    <input id="nombre" type="text" placeholder="Ej...Jabón rey, Huevos, Arroz">
+                    <input id="nombre" v-model="product.name" type="text" placeholder="Ej...Jabón rey, Huevos, Arroz">
                 </div>
             </label>
             <label for="precio">
                 <p>Precio</p>
                 <div class="input">
-                    <input id="precio" type="text" placeholder="Ej...1000, 15000, 30000">
+                    <input id="precio" v-model="product.price" type="text" placeholder="Ej...1000, 15000, 30000">
                 </div>
             </label>
             <label for="categoria">
                 <p>Categoria</p>
                 <div class="input">
                     <div class="box">
-                        <select id="categoria" >
-                            <option value="">Seleccione una categoria</option>
+                        <select id="categoria">
+                            <option value="">{{ product.category }}</option>
                             <option value="">Aseo</option>
                             <option value="">Lacteos</option>
                             <option value="">Licores</option>
@@ -41,7 +41,7 @@
             </div>
             <div class="normal-button">
                 <Button type="normal">
-                    <p>Guardar</p>
+                    <p>Editar</p>
                 </Button>
             </div>            
         </form>
@@ -54,8 +54,46 @@
 <script>
 import Button from '../components/Button';
 export default {
+    data(){
+        return{
+            product:{
+                name:      '',
+                price:     '',
+                imgUrl:    '',
+                category:  '',
+                idProduct: ''
+            }
+        }
+    },
     components:{
         Button
+    },
+    methods:{
+        setProduct(){
+            this.product.idProduct = this.$route.params.id;
+            this.product.imgUrl    = this.$route.params.img;
+            this.product.name      = this.$route.params.name;
+            this.product.price     = this.$route.params.price;
+            this.product.category  = this.$route.params.category;
+        },
+        back(){
+            let slug = this.$route.params.slug;
+            
+            this.$router.push({
+                name:"producto",
+                params: {
+                    slug,
+                    img:      this.product.imgUrl,
+                    name:     this.product.name,
+                    price:    this.product.price,
+                    category: this.product.category,
+                    id:       this.product.idProduct
+                }
+            });
+        }
+    },
+    mounted(){
+        this.setProduct();
     }
 }
 </script>

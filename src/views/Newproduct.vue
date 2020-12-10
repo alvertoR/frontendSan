@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Button type="circle">
+        <Button @click="back()" type="circle">
             <img src="../assets/landing/back.svg" />
         </Button>
         <h2>Datos del producto</h2>
@@ -56,6 +56,11 @@ import Button from '../components/Button';
 export default {
     components:{
         Button
+    },
+    methods:{
+        back(){
+            this.$router.push({ path: '/user' });
+        }
     }
 }
 </script>
