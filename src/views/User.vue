@@ -4,7 +4,7 @@
             <div>
                 <h1>Omar San</h1>
                 <div class="button">
-                    <Button type="circle">
+                    <Button @click="closeSession()" type="circle">
                         <img src="../assets/landing/logout.svg">
                     </Button>   
                 </div>
@@ -35,7 +35,7 @@
 
 <script>
 
-import Button from '../components/Button.vue';
+import Button    from '../components/Button.vue';
 import routesApi from '../backRoutes';
 
 export default {
@@ -90,6 +90,16 @@ export default {
         },
         viewAddProduct(){
             this.$router.push({ path: "/agregar-producto" });
+        },
+        closeSession(){
+            localStorage.removeItem("session");
+            this.$router.push({ path: "/" });
+        },
+        sessionExists(){
+            let session = localStorage.getItem("session")
+            if(!session){
+                this.$router.push({ path: '/' });
+            }
         }
 
     },
@@ -101,6 +111,7 @@ export default {
         },        
     },
     mounted(){
+        this.sessionExists();
         this.getProducts();
     }
 }
@@ -148,6 +159,11 @@ img{
 .button Button{
     padding-left: 16px;
     padding-top: 8px;
+}
+
+.button Button:focus{
+    outline: none;
+    border:none;
 }
 
 /*Fin estilos header*/

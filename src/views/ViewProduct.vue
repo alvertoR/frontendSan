@@ -34,7 +34,7 @@ export default {
     },
     data(){
         return{
-            login: true,
+            login: false,
             product:{
                 name:      '',
                 price:     '',
@@ -71,9 +71,16 @@ export default {
                     id:       this.product.idProduct
                 }
             });
+        },
+        sessionExists(){
+            let session = localStorage.getItem("session")
+            if(session){
+                this.login = true;
+            }
         }
     },
     mounted(){
+        this.sessionExists();
         this.setProduct();
     }
 }

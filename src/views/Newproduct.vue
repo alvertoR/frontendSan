@@ -3,29 +3,51 @@
         <Button @click="back()" type="circle">
             <img src="../assets/landing/back.svg" />
         </Button>
+        <!--Modal-->
+        <div class="bg-modal">
+            <div class="login" v-if="add == true">
+                <div class="noMama">
+                    <img src="../assets/landing/car.svg" />
+                    <p>Producto agregado</p>
+                    <Button @click="byePop()" type="alert">
+                        <p>Continuar</p>
+                    </Button>
+                </div>
+            </div>
+            <div class="login" v-if="failed == true">
+                <div class="noMama">
+                    <img src="../assets/landing/error.svg" />
+                    <p>Algo salió mal</p>
+                    <Button @click="errorPop()" type="alert">
+                        <p>Cerra</p>
+                    </Button>
+                </div>
+            </div>
+        </div>
+        <!--Fin moodal-->
         <h2>Datos del producto</h2>
-        <form action="">
+        <form @submit.prevent="addProduct(infoProduct)">
             <label for="nombre">
                 <p>Nombre</p>
                 <div class="input">
-                    <input id="nombre" type="text" placeholder="Ej...Jabón rey, Huevos, Arroz">
+                    <input id="nombre" required v-model="infoProduct.name" type="text" placeholder="Ej...Jabón rey, Huevos, Arroz">
                 </div>
             </label>
             <label for="precio">
                 <p>Precio</p>
                 <div class="input">
-                    <input id="precio" type="text" placeholder="Ej...1000, 15000, 30000">
+                    <input id="precio" required v-model="infoProduct.price" type="text" placeholder="Ej...1000, 15000, 30000">
                 </div>
             </label>
             <label for="categoria">
                 <p>Categoria</p>
                 <div class="input">
                     <div class="box">
-                        <select id="categoria" >
+                        <select required id="categoria" v-model="infoProduct.category">
                             <option value="">Seleccione una categoria</option>
-                            <option value="">Aseo</option>
-                            <option value="">Lacteos</option>
-                            <option value="">Licores</option>
+                            <option value="Aseo">Aseo</option>
+                            <option value="Lacteos">Lacteos</option>
+                            <option value="Licores">Licores</option>
                         </select>
                     </div>                    
                 </div>
@@ -36,7 +58,7 @@
                     <div class="button-file">
                         <img src="../assets/landing/file.svg" />
                     </div>
-                    <input type="file" name="" id="imagen">
+                    <input required @change="getFile" type="file" name="" id="imagen">
                 </label>
             </div>
             <div class="normal-button">
@@ -52,15 +74,75 @@
 </template>
 
 <script>
-import Button from '../components/Button';
+import Button    from '../components/Button';
+import routesApi from '../backRoutes'; 
 export default {
+    data(){
+        return{
+            infoProduct:{
+                name:'',
+                price:'',
+                category:''
+            },
+            image:'',
+            add:false,
+            failed: false,
+        }
+    },
     components:{
         Button
     },
     methods:{
+        getFile(event){
+            let archivoImg = event.target.files[0];
+            this.image = archivoImg;
+        },
+        addProduct(infoProduct){
+            let archivo = this.image;
+
+            const formData = new FormData();
+            formData.append("image",archivo);
+            formData.append("name", infoProduct.name);
+            formData.append("value", infoProduct.price);
+            formData.append("category", infoProduct.category)
+
+            this.axios.post(routesApi.addProduct, formData).then(res => {
+
+                let reply = res.data.state;
+                let containerModal = document.querySelector('.bg-modal');
+
+                if(res.data.state){                    
+                    containerModal.style.display = "flex";
+                    this.add = true;
+                }else{
+                    containerModal.style.display = "flex";
+                    this.failed = true;
+                }
+            });
+        },
         back(){
             this.$router.push({ path: '/user' });
+        },
+        sessionExists(){
+            let session = localStorage.getItem("session")
+            if(!session){
+                this.$router.push({ path: '/' });
+            }
+        },
+        byePop(){
+            this.infoProduct.name     = '';
+            this.infoProduct.price    = '';
+            this.infoProduct.category = ''
+            this.$router.push({ path: '/user' });
+        },
+        errorPop(){
+            let containerModal = document.querySelector('.bg-modal');
+            containerModal.style.display = "none";
+            this.failed = false;
         }
+    },
+    mounted(){
+        this.sessionExists();
     }
 }
 </script>
@@ -244,4 +326,67 @@ footer p{
     color: rgba(9, 75, 75);
     margin-top:-2vw;
 }
+
+/*Inicio estilo modals*/
+.bg-modal{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0,0.2);
+    position: fixed;
+    top: 0;
+    left:0;
+    margin-top:0;
+    z-index:100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display:none;
+}
+
+.login{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    background-color:#ffffff;
+    height: 100vw;
+    width: 90vw;
+    border: 1px solid #D47312;
+    border-radius: 6vw;
+}
+
+.login Button{
+    margin-right: 5vw;
+}
+
+.login Button p{
+    margin:0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 6vw;
+    color:#fff;
+}
+
+.noMama{
+    height: 100%;
+    width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.noMama img{
+    width: 50vw;
+    height: 40vw;
+}
+
+.noMama > p{
+    font-size: 8vw;
+    font-family: 'Quicksand', sans-serif;
+    font-style: normal;
+    font-weight: 300;
+}
+/*Fin estilos modals */
 </style>

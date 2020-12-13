@@ -4,7 +4,7 @@
             <img src="../assets/landing/back.svg" />
         </Button>
         <h2>Datos del producto</h2>
-        <form action="">
+        <form @submit.prevent="editProduct(product)">
             <label for="nombre">
                 <p>Nombre</p>
                 <div class="input">
@@ -14,18 +14,18 @@
             <label for="precio">
                 <p>Precio</p>
                 <div class="input">
-                    <input id="precio" v-model="product.price" type="text" placeholder="Ej...1000, 15000, 30000">
+                    <input id="precio" v-model="product.value" type="text" placeholder="Ej...1000, 15000, 30000">
                 </div>
             </label>
             <label for="categoria">
                 <p>Categoria</p>
                 <div class="input">
                     <div class="box">
-                        <select id="categoria">
-                            <option value="">{{ product.category }}</option>
-                            <option value="">Aseo</option>
-                            <option value="">Lacteos</option>
-                            <option value="">Licores</option>
+                        <select id="categoria" v-model="product.category">
+                            <option value="">Seleccione una categoria</option>
+                            <option value="Aseo">Aseo</option>
+                            <option value="Lacteos">Lacteos</option>
+                            <option value="Licores">Licores</option>
                         </select>
                     </div>                    
                 </div>
@@ -36,7 +36,7 @@
                     <div class="button-file">
                         <img src="../assets/landing/file.svg" />
                     </div>
-                    <input type="file" name="" id="imagen">
+                    <input  @change="getFile" type="file" name="" id="imagen">
                 </label>
             </div>
             <div class="normal-button">
@@ -52,17 +52,19 @@
 </template>
 
 <script>
-import Button from '../components/Button';
+import Button    from '../components/Button';
+import routesApi from '../backRoutes';
 export default {
     data(){
         return{
             product:{
                 name:      '',
-                price:     '',
+                value:     '',
                 imgUrl:    '',
                 category:  '',
                 idProduct: ''
-            }
+            },
+            image:''
         }
     },
     components:{
@@ -73,8 +75,38 @@ export default {
             this.product.idProduct = this.$route.params.id;
             this.product.imgUrl    = this.$route.params.img;
             this.product.name      = this.$route.params.name;
-            this.product.price     = this.$route.params.price;
+            this.product.value     = this.$route.params.price;
             this.product.category  = this.$route.params.category;
+        },
+        getFile(event){
+            let archivoImg = event.target.files[0];
+            this.image = archivoImg;
+        },
+        editProduct(infoProduct){
+
+            let archivo = this.image;     
+            
+            const formData = new FormData();
+
+            if(!archivo !== ''){
+                formData.append("image", archivo);
+            }
+                              
+            this.axios.put(`${routesApi.updateProduct}${infoProduct.idProduct}`, {infoProduct, formData}).then(res => {
+
+                console.log(res.data);
+                let reply = res.data.state;
+                let containerModal = document.querySelector('.bg-modal');
+                
+                if(res.data.state){                    
+                    containerModal.style.display = "flex";
+                    this.add = true;
+                }else{
+                    containerModal.style.display = "flex";
+                    this.failed = true;
+                }
+                
+            });
         },
         back(){
             let slug = this.$route.params.slug;
@@ -90,9 +122,16 @@ export default {
                     id:       this.product.idProduct
                 }
             });
+        },
+        sessionExists(){
+            let session = localStorage.getItem("session")
+            if(!session){
+                this.$router.push({ path: '/' });
+            }
         }
     },
     mounted(){
+        this.sessionExists();
         this.setProduct();
     }
 }
