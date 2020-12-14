@@ -1,4 +1,4 @@
-let urlBack = 'http://localhost:3000/omarSan/';
+let urlBack = 'https://backomarsan.herokuapp.com/omarSan/';
 
 const routesApi = {
     getProducts:   `${urlBack}product/products`,

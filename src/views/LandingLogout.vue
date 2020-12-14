@@ -92,7 +92,7 @@ export default {
             this.axios.get(routesApi.getProducts)
             .then((res) => {
                 let products = res.data.data;
-                console.log(products);
+                
                 products.map((value) => {
                     listProducts.push({
                         id:       value._id,

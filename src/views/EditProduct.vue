@@ -3,6 +3,28 @@
         <Button @click="back()" type="circle">
             <img src="../assets/landing/back.svg" />
         </Button>
+        <!--Modal-->
+        <div class="bg-modal">
+            <div class="login" v-if="add == true">
+                <div class="noMama">
+                    <img src="../assets/landing/car.svg" />
+                    <p>Producto actualizado</p>
+                    <Button @click="byePop()" type="alert">
+                        <p>Continuar</p>
+                    </Button>
+                </div>
+            </div>
+            <div class="login" v-if="failed == true">
+                <div class="noMama">
+                    <img src="../assets/landing/error.svg" />
+                    <p>Algo salió mal</p>
+                    <Button @click="errorPop()" type="alert">
+                        <p>Cerra</p>
+                    </Button>
+                </div>
+            </div>
+        </div>
+        <!--Fin moodal-->
         <h2>Datos del producto</h2>
         <form @submit.prevent="editProduct(product)">
             <label for="nombre">
@@ -30,15 +52,6 @@
                     </div>                    
                 </div>
             </label>
-            <div class="load">
-                <label for="imagen">
-                    <p>Cargar Imagen</p>
-                    <div class="button-file">
-                        <img src="../assets/landing/file.svg" />
-                    </div>
-                    <input  @change="getFile" type="file" name="" id="imagen">
-                </label>
-            </div>
             <div class="normal-button">
                 <Button type="normal">
                     <p>Editar</p>
@@ -64,7 +77,9 @@ export default {
                 category:  '',
                 idProduct: ''
             },
-            image:''
+            image:'',
+            add:true,
+            failed: false,
         }
     },
     components:{
@@ -78,23 +93,10 @@ export default {
             this.product.value     = this.$route.params.price;
             this.product.category  = this.$route.params.category;
         },
-        getFile(event){
-            let archivoImg = event.target.files[0];
-            this.image = archivoImg;
-        },
         editProduct(infoProduct){
+                            
+            this.axios.put(`${routesApi.updateProduct}${infoProduct.idProduct}`, infoProduct).then(res => {
 
-            let archivo = this.image;     
-            
-            const formData = new FormData();
-
-            if(!archivo !== ''){
-                formData.append("image", archivo);
-            }
-                              
-            this.axios.put(`${routesApi.updateProduct}${infoProduct.idProduct}`, {infoProduct, formData}).then(res => {
-
-                console.log(res.data);
                 let reply = res.data.state;
                 let containerModal = document.querySelector('.bg-modal');
                 
@@ -128,6 +130,17 @@ export default {
             if(!session){
                 this.$router.push({ path: '/' });
             }
+        },
+        byePop(){
+            this.product.name     = '';
+            this.product.price    = '';
+            this.product.category = ''
+            this.$router.push({ path: '/user' });
+        },
+        errorPop(){
+            let containerModal = document.querySelector('.bg-modal');
+            containerModal.style.display = "none";
+            this.failed = false;
         }
     },
     mounted(){
@@ -165,6 +178,10 @@ form{
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+label{
+    margin-top:2vw;
 }
 
 label p{
@@ -282,7 +299,7 @@ label p{
 }
 
 .normal-button > Button{
-    margin:8vw auto;
+    margin:12vw auto;
     display:flex;
     flex-direction: row;
     justify-content: center;
@@ -314,6 +331,68 @@ footer p{
     font-weight: 300;
     font-size: 3vw;
     color: rgba(9, 75, 75);
-    margin-top:-2vw;
+    margin-top:3vw;
 }
+/*Inicio estilo modals*/
+.bg-modal{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0,0.2);
+    position: fixed;
+    top: 0;
+    left:0;
+    margin-top:0;
+    z-index:100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+
+.login{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    background-color:#ffffff;
+    height: 100vw;
+    width: 90vw;
+    border: 1px solid #D47312;
+    border-radius: 6vw;
+}
+
+.login Button{
+    margin-right: 5vw;
+}
+
+.login Button p{
+    margin:0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 6vw;
+    color:#fff;
+}
+
+.noMama{
+    height: 100%;
+    width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.noMama img{
+    width: 50vw;
+    height: 40vw;
+}
+
+.noMama > p{
+    font-size: 8vw;
+    font-family: 'Quicksand', sans-serif;
+    font-style: normal;
+    font-weight: 300;
+}
+/*Fin estilos modals */
 </style>
