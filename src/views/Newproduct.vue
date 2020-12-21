@@ -45,9 +45,24 @@
                     <div class="box">
                         <select required id="categoria" v-model="infoProduct.category">
                             <option value="">Seleccione una categoria</option>
-                            <option value="Aseo">Aseo</option>
-                            <option value="Lacteos">Lacteos</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Carnes frías">Carnes frías</option>
+                            <option value="Cocina">Cocina</option>
+                            <option value="Desechables">Desechables</option>
+                            <option value="Dulcería">Dulcería</option>
+                            <option value="Especial">Especial</option>
+                            <option value="Galguería">Galguería</option>
+                            <option value="Heladería">Heladería</option>
+                            <option value="Lácteos">Lácteos</option>
                             <option value="Licores">Licores</option>
+                            <option value="Medicina">Medicina</option>
+                            <option value="Panadería">Panadería</option>
+                            <option value="Purinas">Purinas</option>
+                            <option value="Salsas">Salsas</option>
+                            <option value="Utiles de aseo(Hogar)">Utiles de aseo(Hogar)</option>
+                            <option value="Utiles de aseo(Personal)">Utiles de aseo(Personal)</option>
+                            <option value="Víveres">Víveres</option>
+                            <option value="Otros">Otros</option>
                         </select>
                     </div>                    
                 </div>
